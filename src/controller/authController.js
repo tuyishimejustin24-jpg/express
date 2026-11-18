@@ -1,5 +1,7 @@
+import { StatusCodes } from "http-status-codes";
 import User from "../models/userModel.js";
-import hashpassword from "../utils/passwordUtils.js"
+import hashpassword, { comparePassword } from "../utils/passwordUtils.js"
+import jwt from "jsonwebtoken";
 
 class controller{
   static signup = async(req,res)=>{
@@ -94,11 +96,11 @@ static login = async (req, res) => {
           message: "Invalid email or password"
         });
       } else {
-        const verfiedPassword = comparePassword(req.body.password);
+        const verfiedPassword = await comparePassword(req.body.password,user.password);
         if (!verfiedPassword) {
           return res.status(StatusCodes.UNAUTHORIZED).json({
             success: false,
-            message: "Invalid email or password"
+            message: "Invalid email or password....."
           });
         } else {
           const userInfo = {
@@ -107,6 +109,8 @@ static login = async (req, res) => {
           };
 
           const token = jwt.sign(userInfo, process.env.SCRET_KEY, { expiresIn: "1d" });
+          
+          console.log("logged in successfully")
           return res.status(StatusCodes.OK).json({
             success: true,
             message: token
@@ -117,7 +121,7 @@ static login = async (req, res) => {
       console.log(error);
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: "Failed to create user",
+        message: "Failed to login",
         error: error.message
       });
     }

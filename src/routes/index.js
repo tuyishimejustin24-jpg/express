@@ -1,7 +1,6 @@
 import express from "express"
-import authRouter from "./categoryRouter.js"
+import authRouter from "./authRouter.js"
 import categoryRouter from "./categoryRouter.js"
-import Category from "../models/categoryModels.js"
 
 const router = express.Router()
 
